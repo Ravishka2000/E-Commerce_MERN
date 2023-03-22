@@ -1,5 +1,7 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
+import bcrypt from "bcrypt";
+import generateToken from "../config/jwtToken.js";
 
 const createUser = asyncHandler( async (req, res) => {
     const {firstName, lastName, email, mobile, password} = req.body;
@@ -19,6 +21,39 @@ const createUser = asyncHandler( async (req, res) => {
     }
 });
 
+const loginUser = asyncHandler (async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password){
+        res.status(400);
+        throw new Error("Please enter email and password");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user){
+        res.status(400);
+        throw new Error("User not found, Please SignUp");
+    }
+
+    const passwordIsCorrect = await bcrypt.compare(password, user.password);
+
+    if (user && passwordIsCorrect){
+        const {_id, firstName, email, mobile } = user
+        res.status(200).json({
+            _id, 
+            firstName,
+            email,
+            mobile,
+            token: generateToken(user._id),
+        })
+    } else {
+        res.status(400);
+        throw new Error("Invalid Email or Password");
+    }
+
+});
+
 export default {
-    createUser
+    createUser,
+    loginUser
 }
