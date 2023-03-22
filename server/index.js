@@ -1,23 +1,29 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import dbConnect from './config/dbConnect.js';
-import authRouter from './routes/UserRoutes.js';
-import bodyParser from 'body-parser';
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import UserRoutes from "./routes/UserRoutes.js";
+import Handlers from "./middlewares/errorHandler.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
-dbConnect();
-
 const app = express();
-app.use(bodyParser.json)
+const PARAMS = {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+};
+const URI = process.env.MONGODB_URL;
+const PORT = process.env.PORT || 5000;
+
 app.use(express.json());
 app.use(cors());
+app.use("/api/user", UserRoutes);
 
+app.use(Handlers.notfound);
+app.use(Handlers.errorHandler);
 
-app.use('/api/user', authRouter);
-
-const port = process.env.PORT || 5000;
-
-app.listen(PORT, () => console.log(`Server running on port ${port} 🔥`));
+mongoose.set("strictQuery", false);
+mongoose.connect(URI, PARAMS)
+    .then(() => app.listen(PORT, 
+        () => console.info(`Server running on PORT ${PORT} 🔥`)))
+    .catch((err) => console.error(err.message));

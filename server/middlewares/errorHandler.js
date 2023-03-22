@@ -15,5 +15,5 @@ const errorHandler = (err, req, res, next) => {
 
 export default {
     notfound,
-    errorHandler
+    errorHandler,
 }
