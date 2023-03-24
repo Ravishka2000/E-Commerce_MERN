@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import generateToken from "../config/jwtToken.js";
+import validateMongoDbId from "../utils/validateMongoDbId.js";
 
 const createUser = asyncHandler( async (req, res) => {
     const {firstName, lastName, email, mobile, password} = req.body;
@@ -64,6 +65,7 @@ const getAllUsers = asyncHandler (async (req, res) => {
 
 const getUser = asyncHandler (async (req, res) => {
     const { id } = req.params;
+    validateMongoDbId(_id);
     try {
         const user = await User.findById(id);
     res.json(user);
@@ -74,6 +76,7 @@ const getUser = asyncHandler (async (req, res) => {
 
 const deleteUser = asyncHandler (async (req, res) => {
     const { id } = req.params;
+    validateMongoDbId(_id);
     try {
         const user = await User.findByIdAndDelete(id);
     res.json(user);
@@ -83,10 +86,11 @@ const deleteUser = asyncHandler (async (req, res) => {
 });
 
 const updateUser = asyncHandler (async (req, res) => {
-    const { id } = req.params;
+    const { _id } = req.user;
+    validateMongoDbId(_id);
     const { firstName, lastName, email, mobile } = req.body;
     try {
-        const updatedUser = await User.findByIdAndUpdate(id, {
+        const updatedUser = await User.findByIdAndUpdate(_id, {
             firstName,
             lastName,
             email,
@@ -100,11 +104,47 @@ const updateUser = asyncHandler (async (req, res) => {
     }
 });
 
+const blockUser = asyncHandler (async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(_id);
+    try {
+        const block = await User.findByIdAndUpdate(id, {
+            isBlocked: true,
+        },{
+            new: true,
+        });
+        res.json({
+            message: "User Blocked",
+        })
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+const unBlockUser = asyncHandler (async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(_id);
+    try {
+        const unBlock = await User.findByIdAndUpdate(id, {
+            isBlocked: false,
+        },{
+            new: true,
+        });
+        res.json({
+            message: "User Unblocked",
+        })
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createUser,
     loginUser,
     getAllUsers,
     getUser,
     deleteUser,
-    updateUser
+    updateUser,
+    blockUser,
+    unBlockUser
 }
