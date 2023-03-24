@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import UserRoutes from "./routes/UserRoutes.js";
 import Handlers from "./middlewares/errorHandler.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 app.use("/api/user", UserRoutes);
 
 app.use(Handlers.notfound);

@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import generateToken from "../config/jwtToken.js";
 import validateMongoDbId from "../utils/validateMongoDbId.js";
+import generateRefreshToken from "../config/refreshToken.js";
 
 const createUser = asyncHandler( async (req, res) => {
     const {firstName, lastName, email, mobile, password} = req.body;
@@ -39,7 +40,21 @@ const loginUser = asyncHandler (async (req, res) => {
     const passwordIsCorrect = await bcrypt.compare(password, user.password);
 
     if (user && passwordIsCorrect){
-        const {_id, firstName, email, mobile } = user
+        const refreshToken = generateRefreshToken(user?._id);
+        const {_id, firstName, email, mobile } = user;
+        const updateUser = await User.findOneAndUpdate(
+            user._id, 
+                {
+                    refreshToken: refreshToken
+                },
+                {
+                    new: true
+                }
+            )
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 72 * 1000,
+        })
         res.status(200).json({
             _id, 
             firstName,
