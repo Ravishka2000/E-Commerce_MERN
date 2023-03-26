@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import generateToken from "../config/jwtToken.js";
 import generateRefreshToken from "../config/refreshToken.js";
+import sendEmail from "./EmailController.js";
 import jwt from "jsonwebtoken";
 // import validateMongoDbId from "../utils/validateMongoDbId.js";
 
@@ -197,6 +198,42 @@ const logout = asyncHandler (async (req, res) => {
     return res.sendStatus(204);
 });
 
+const updatePassword = asyncHandler (async (req, res) => {
+    const { _id } = req.user;
+    const { password } = req.body;
+    const user = await User.findById(_id);
+    if(password){
+        user.password = password;
+        const updatedPasword = await user.save();
+        res.json(updatedPasword);
+    }else{
+        res.json(user);
+    }
+});
+
+const forgotPasswordToken = asyncHandler (async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if(!user){
+        throw new Error("User not found");
+    }
+    try {
+        const token = await user.createPasswordResetToken();
+        await user.save();
+        const resetURL = `Hi, Please follow this link to reset your password. This link is valid till 10 minutes from now. <a href='http://localhost:7002/api/user/reset-password/${token}'>Click Here</a>`;
+        const data = {
+            to: email,
+            subject: "Forgot Password Link",
+            text: "Hey user",
+            htm: resetURL,
+        }
+        sendEmail(data);
+        res.json(token);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createUser,
     loginUser,
@@ -208,4 +245,6 @@ export default {
     unBlockUser,
     handleRefreshToken,
     logout,
+    updatePassword,
+    forgotPasswordToken,
 }
