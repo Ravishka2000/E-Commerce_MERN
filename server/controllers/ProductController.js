@@ -14,9 +14,19 @@ const createProduct = asyncHandler (async (req, res) => {
     } catch (error) {
         throw new Error(error);
     }
-    
+});
+
+const getaProduct = asyncHandler (async (req, res) => {
+    const { id } = req.params;
+    try {
+        const product = await Product.findById(id);
+        res.json(product);
+    } catch (error) {
+        throw new Error(error);
+    }
 });
 
 export default{
     createProduct,
+    getaProduct,
 }
