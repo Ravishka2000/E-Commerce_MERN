@@ -5,6 +5,7 @@ import generateToken from "../config/jwtToken.js";
 import generateRefreshToken from "../config/refreshToken.js";
 import sendEmail from "./EmailController.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 // import validateMongoDbId from "../utils/validateMongoDbId.js";
 
 const createUser = asyncHandler( async (req, res) => {
@@ -234,6 +235,26 @@ const forgotPasswordToken = asyncHandler (async (req, res) => {
     }
 });
 
+const resetPassword = asyncHandler (async (req, res) => {
+    const { password } = req.body;
+    const { token } = req.params;
+    const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+    const user = await User.findOne({
+        passwordResetToken: hashToken,
+        passwordResetExpires: {
+            $gt: Date.now()
+        }
+    });
+    if(!user){
+        throw new Error("Token expired, please try again");
+    }
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    res.json(user);
+});
+
 export default {
     createUser,
     loginUser,
@@ -247,4 +268,5 @@ export default {
     logout,
     updatePassword,
     forgotPasswordToken,
+    resetPassword,
 }
