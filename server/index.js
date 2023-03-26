@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import morgan from "morgan";
 import UserRoutes from "./routes/UserRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import Handlers from "./middlewares/errorHandler.js";
@@ -17,6 +18,7 @@ const PARAMS = {
 const URI = process.env.MONGODB_URL;
 const PORT = process.env.PORT || 5000;
 
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
