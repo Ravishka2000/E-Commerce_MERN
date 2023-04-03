@@ -47,9 +47,20 @@ const getAllBlogs = asyncHandler (async (req, res) => {
     }
 });
 
+const deleteBlog = asyncHandler (async (req, res) => {
+    const { id } = req.params;
+    try {
+        const blog = await Blog.findByIdAndDelete(id);
+        res.json(blog);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createBlog,
     updateBlog,
     getBlog,
     getAllBlogs,
+    deleteBlog,
 }
