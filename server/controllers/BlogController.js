@@ -38,8 +38,18 @@ const getBlog = asyncHandler (async (req, res) => {
     }
 });
 
+const getAllBlogs = asyncHandler (async (req, res) => {
+    try {
+        const blogs = await Blog.find();
+        res.json(blogs);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createBlog,
     updateBlog,
     getBlog,
+    getAllBlogs,
 }

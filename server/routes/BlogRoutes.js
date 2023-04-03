@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, BlogController.createBlog);
 router.put('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, BlogController.updateBlog);
 router.get('/:id', BlogController.getBlog);
+router.get('/', BlogController.getAllBlogs);
 
 export default router;
