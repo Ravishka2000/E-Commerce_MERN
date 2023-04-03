@@ -57,10 +57,52 @@ const deleteBlog = asyncHandler (async (req, res) => {
     }
 });
 
+const likeBlog = asyncHandler (async (req, res) => {
+    const { blogId } = req.body
+    try {
+        const blog  = await Blog.findById(blogId);
+        const loginUserId = req?.user?._id;
+        console.log(loginUserId);
+        const isLiked = blog?.isLiked;
+        const alreadyDisliked = blog?.disLikes?.find(
+            (userId => userId?.toString() === loginUserId?.toString())
+        );
+        if(alreadyDisliked){
+            const blog = await Blog.findByIdAndUpdate(blogId, {
+                $pull: { disLikes: loginUserId },
+                isDisliked: false,
+            },{
+                new: true,
+            });
+            res.json(blog);
+        }
+        if(isLiked){
+            const blog = await Blog.findByIdAndUpdate(blogId, {
+                $pull: { likes: loginUserId },
+                isLiked: false,
+            },{
+                new: true,
+            });
+            res.json(blog);
+        }else {
+            const blog = await Blog.findByIdAndUpdate(blogId, {
+                $push: { likes: loginUserId },
+                isLiked: true,
+            },{
+                new: true,
+            });
+            res.json(blog);
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createBlog,
     updateBlog,
     getBlog,
     getAllBlogs,
     deleteBlog,
+    likeBlog,
 }
