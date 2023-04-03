@@ -23,7 +23,23 @@ const updateBlog = asyncHandler (async (req, res) => {
     }
 });
 
+const getBlog = asyncHandler (async (req, res) => {
+    const { id } = req.params;
+    try {
+        const blog = await Blog.findById(id);
+        await Blog.findByIdAndUpdate(id, {
+            $inc:{numViews:1}
+        }, {
+            new: true
+        })
+        res.json(blog);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createBlog,
     updateBlog,
+    getBlog,
 }
