@@ -7,6 +7,7 @@ import UserRoutes from "./routes/UserRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import BlogRoutes from "./routes/BlogRoutes.js";
 import ProductCategoryRoutes from "./routes/ProductsCategoryRoutes.js";
+import BlogCategoryRoutes from "./routes/BlogCategoryRoutes.js";
 import Handlers from "./middlewares/errorHandler.js";
 import cookieParser from "cookie-parser";
 
@@ -29,6 +30,7 @@ app.use("/api/user", UserRoutes);
 app.use("/api/product", ProductRoutes);
 app.use("/api/blog", BlogRoutes);
 app.use("/api/category", ProductCategoryRoutes);
+app.use("/api/blogcategory", BlogCategoryRoutes);
 
 app.use(Handlers.notfound);
 app.use(Handlers.errorHandler);
