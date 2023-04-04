@@ -62,7 +62,6 @@ const likeBlog = asyncHandler (async (req, res) => {
     try {
         const blog  = await Blog.findById(blogId);
         const loginUserId = req?.user?._id;
-        console.log(loginUserId);
         const isLiked = blog?.isLiked;
         const alreadyDisliked = blog?.disLikes?.find(
             (userId => userId?.toString() === loginUserId?.toString())
