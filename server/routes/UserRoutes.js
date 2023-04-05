@@ -15,6 +15,7 @@ router.get('/all-users', UserControllers.getAllUsers);
 router.get('/refresh', UserControllers.handleRefreshToken);
 router.get('/logout', UserControllers.logout);
 router.get('/wishlist', AuthMiddlewares.authMiddleware, UserControllers.getWishlist);
+router.get('/cart', AuthMiddlewares.authMiddleware, UserControllers.getUserCart);
 router.get('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, UserControllers.getUser);
 router.delete('/:id', UserControllers.deleteUser);
 router.put('/update-user', AuthMiddlewares.authMiddleware, UserControllers.updateUser);
