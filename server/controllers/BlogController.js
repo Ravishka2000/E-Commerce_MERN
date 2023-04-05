@@ -1,6 +1,8 @@
 import Blog from "../models/BlogModel.js";
 import User from "../models/User.js";
 import asyncHandler from "express-async-handler";
+import cloudinaryUploadImg from "../utils/cloudinary.js";
+import fs from 'fs';
 
 const createBlog = asyncHandler (async (req, res) => {
     try {
@@ -138,6 +140,31 @@ const disLikeBlog = asyncHandler (async (req, res) => {
     }
 });
 
+const uploadImages = asyncHandler (async (req, res) => {
+    const { id } = req.params;
+    try {
+        const uploader = (path) => cloudinaryUploadImg(path, "images");
+        const urls = [];
+        const files = req.files;
+        for(const file of files){
+            const { path } = file;
+            const newPath = await uploader(path);
+            urls.push(newPath);
+            fs.unlinkSync(path);
+        }
+        const findBlog = await Blog.findByIdAndUpdate(id, {
+            images: urls.map((file) => {
+                return file;
+            })
+        }, {
+            new: true,
+        })
+        res.json(findBlog);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createBlog,
     updateBlog,
@@ -146,4 +173,5 @@ export default {
     deleteBlog,
     likeBlog,
     disLikeBlog,
+    uploadImages,
 }

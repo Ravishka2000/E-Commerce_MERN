@@ -3,6 +3,7 @@ import Product from "../models/ProductModel.js";
 import User from "../models/User.js";
 import slugify from "slugify";
 import cloudinaryUploadImg from "../utils/cloudinary.js";
+import fs from 'fs';
 
 const createProduct = asyncHandler (async (req, res) => {
     try {
@@ -177,6 +178,7 @@ const uploadImages = asyncHandler (async (req, res) => {
             const { path } = file;
             const newPath = await uploader(path);
             urls.push(newPath);
+            fs.unlinkSync(path);
         }
         const findProduct = await Product.findByIdAndUpdate(id, {
             images: urls.map((file) => {
