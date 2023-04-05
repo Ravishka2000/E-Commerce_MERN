@@ -3,12 +3,14 @@ import User from "../models/User.js";
 import Product from "../models/ProductModel.js";
 import Cart from "../models/CartModel.js";
 import Coupon from "../models/CouponModel.js";
+import Order from "../models/orderModel.js";
 import bcrypt from "bcrypt";
 import generateToken from "../config/jwtToken.js";
 import generateRefreshToken from "../config/refreshToken.js";
 import sendEmail from "./EmailController.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import uniqid from "uniqid";
 
 const createUser = asyncHandler( async (req, res) => {
     const {firstName, lastName, email, mobile, password} = req.body;
@@ -401,6 +403,50 @@ const applyCoupon = asyncHandler (async (req, res) => {
     res.json(totalAfterDiscount);
 });
 
+const createOrder = asyncHandler (async (req, res) => {
+    const { COD, couponApplied } = req.body;
+    const { _id } = req.user;
+    try {
+        if(!COD){
+            throw new Error("Create Cash order failed");
+        }
+        const user = await User.findById(_id);
+        let userCart = await Cart.findOne({ orderby: user._id });
+        let finalAmount = 0;
+        if (couponApplied && userCart.totalAfterDiscount){
+            finalAmount = userCart.totalAfterDiscount * 100;
+        }else{
+            finalAmount = userCart.cartTotal;
+        }
+
+        let newOrder = await new Order({
+            products: userCart.products,
+            paymentIntent:{
+                id: uniqid(),
+                method: "COD",
+                amount: finalAmount,
+                status: "Cash on Delivery",
+                created: Date.now(),
+                currency: "USD",
+            },
+            orderby: user._id,
+            orderStatus: "Cash on Delivery"
+        }).save();
+        let update = userCart.products.map((item) => {
+            return {
+                updateOne: {
+                    filter: { _id: item.product._id },
+                    update: { $inc: {quantity: item.count, sold: +item.count}},
+                }
+            }
+        })
+        const updated = await Product.bulkWrite(update, {});
+        res.json({message: "success"});
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createUser,
     loginUser,
@@ -422,4 +468,5 @@ export default {
     getUserCart,
     emptyCart,
     applyCoupon,
+    createOrder,
 }
