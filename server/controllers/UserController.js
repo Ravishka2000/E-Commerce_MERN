@@ -369,6 +369,17 @@ const getUserCart = asyncHandler (async (req, res) => {
     }
 });
 
+const emptyCart = asyncHandler (async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const user = await User.findOne(_id);
+        const cart = await Cart.findOneAndRemove({ orderby: user._id });
+        res.json(cart);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createUser,
     loginUser,
@@ -388,4 +399,5 @@ export default {
     getWishlist,
     userCart,
     getUserCart,
+    emptyCart,
 }

@@ -17,6 +17,7 @@ router.get('/logout', UserControllers.logout);
 router.get('/wishlist', AuthMiddlewares.authMiddleware, UserControllers.getWishlist);
 router.get('/cart', AuthMiddlewares.authMiddleware, UserControllers.getUserCart);
 router.get('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, UserControllers.getUser);
+router.delete('/empty-cart', AuthMiddlewares.authMiddleware, UserControllers.emptyCart);
 router.delete('/:id', UserControllers.deleteUser);
 router.put('/update-user', AuthMiddlewares.authMiddleware, UserControllers.updateUser);
 router.put('/save-address', AuthMiddlewares.authMiddleware, UserControllers.saveAddress);
