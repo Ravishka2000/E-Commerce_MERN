@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import Product from "../models/ProductModel.js";
 import Cart from "../models/CartModel.js";
+import Coupon from "../models/CouponModel.js";
 import bcrypt from "bcrypt";
 import generateToken from "../config/jwtToken.js";
 import generateRefreshToken from "../config/refreshToken.js";
@@ -380,6 +381,26 @@ const emptyCart = asyncHandler (async (req, res) => {
     }
 });
 
+const applyCoupon = asyncHandler (async (req, res) => {
+    const { coupon } = req.body;
+    const { _id } = req.user;
+    const validCoupon = await Coupon.findOne({ name: coupon });
+    if(validCoupon === null){
+        throw new Error("Invalid coupon");
+    }
+    const user = await User.findOne({ _id });
+    let {products, cartTotal} = await Cart.findOne({orderby: user._id}).populate("products.product");
+    let totalAfterDiscount = (cartTotal - (cartTotal * validCoupon.discount)/100).toFixed(2);
+    await Cart.findOneAndUpdate({
+        orderby: user._id
+    },{
+        totalAfterDiscount
+    },{
+        new: true,
+    })
+    res.json(totalAfterDiscount);
+});
+
 export default {
     createUser,
     loginUser,
@@ -400,4 +421,5 @@ export default {
     userCart,
     getUserCart,
     emptyCart,
+    applyCoupon,
 }

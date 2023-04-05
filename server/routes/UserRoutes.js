@@ -11,6 +11,7 @@ router.put('/reset-password/:token', UserControllers.resetPassword);
 router.post('/login', UserControllers.loginUser);
 router.post('/admin-login', UserControllers.loginAdmin);
 router.post('/cart', AuthMiddlewares.authMiddleware, UserControllers.userCart);
+router.post('/cart/applycoupon', AuthMiddlewares.authMiddleware, UserControllers.applyCoupon);
 router.get('/all-users', UserControllers.getAllUsers);
 router.get('/refresh', UserControllers.handleRefreshToken);
 router.get('/logout', UserControllers.logout);
