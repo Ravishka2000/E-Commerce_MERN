@@ -38,10 +38,7 @@ var blogSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    image: {
-        type: String,
-        default: "https://img.freepik.com/free-photo/online-message-blog-chat-communication-envelop-graphic-icon-concept_53876-139717.jpg?w=2000&t=st=1680514441~exp=1680515041~hmac=2e3aa9fcb17808445aff670837d3fc7d6342eb61aa3f742b571295eb0de2b9c0"
-    },
+    image: [],
     author:{
         type:String,
         default:"Admin",
