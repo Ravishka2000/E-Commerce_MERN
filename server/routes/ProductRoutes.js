@@ -8,6 +8,7 @@ router.post('/', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, Produc
 router.get('/:id', ProductController.getaProduct);
 router.get('/', ProductController.getAllProducts);
 router.put('/wishlist', AuthMiddlewares.authMiddleware, ProductController.addToWishlist);
+router.put('/rating', AuthMiddlewares.authMiddleware, ProductController.rating);
 router.put('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, ProductController.updateProduct);
 router.delete('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, ProductController.deleteProduct);
 
