@@ -17,6 +17,7 @@ router.get('/wishlist', AuthMiddlewares.authMiddleware, UserControllers.getWishl
 router.get('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, UserControllers.getUser);
 router.delete('/:id', UserControllers.deleteUser);
 router.put('/update-user', AuthMiddlewares.authMiddleware, UserControllers.updateUser);
+router.put('/save-address', AuthMiddlewares.authMiddleware, UserControllers.saveAddress);
 router.put('/block-user/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, UserControllers.blockUser);
 router.put('/unblock-user/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, UserControllers.unBlockUser);
 
