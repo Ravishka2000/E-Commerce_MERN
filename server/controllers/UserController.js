@@ -72,6 +72,55 @@ const loginUser = asyncHandler (async (req, res) => {
 
 });
 
+const loginAdmin = asyncHandler (async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password){
+        res.status(400);
+        throw new Error("Please enter email and password");
+    }
+
+    const admin = await User.findOne({ email });
+    if (admin.role !== 'admin'){
+        throw new Error("Not Authorized");
+    }
+
+    if (!admin){
+        res.status(400);
+        throw new Error("User not found, Please SignUp");
+    }
+
+    const passwordIsCorrect = await bcrypt.compare(password, admin.password);
+
+    if (admin && passwordIsCorrect){
+        const refreshToken = generateRefreshToken(admin?._id);
+        const {_id, firstName, email, mobile } = admin;
+        const updateUser = await User.findOneAndUpdate(
+            admin._id, 
+                {
+                    refreshToken: refreshToken
+                },
+                {
+                    new: true
+                }
+            )
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 72 * 1000,
+        })
+        res.status(200).json({
+            _id, 
+            firstName,
+            email,
+            mobile,
+            token: generateToken(admin._id),
+        })
+    } else {
+        res.status(400);
+        throw new Error("Invalid Email or Password");
+    }
+
+});
+
 const getAllUsers = asyncHandler (async (req, res) => {
     try {
         const getUsers = await User.find();
@@ -255,9 +304,20 @@ const resetPassword = asyncHandler (async (req, res) => {
     res.json(user);
 });
 
+const getWishlist = asyncHandler (async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const user = await User.findById(_id).populate("wishlist");
+        res.json(user);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 export default {
     createUser,
     loginUser,
+    loginAdmin,
     getAllUsers,
     getUser,
     deleteUser,
@@ -269,4 +329,5 @@ export default {
     updatePassword,
     forgotPasswordToken,
     resetPassword,
+    getWishlist,
 }
