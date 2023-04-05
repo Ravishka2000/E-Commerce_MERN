@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, ProductController.createProduct);
 router.get('/:id', ProductController.getaProduct);
 router.get('/', ProductController.getAllProducts);
+router.put('/wishlist', AuthMiddlewares.authMiddleware, ProductController.addToWishlist);
 router.put('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, ProductController.updateProduct);
 router.delete('/:id', AuthMiddlewares.authMiddleware, AuthMiddlewares.isAdmin, ProductController.deleteProduct);
 
